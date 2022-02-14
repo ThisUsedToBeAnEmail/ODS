@@ -1,4 +1,4 @@
-package User;
+package Table::User;
 
 use strict;
 use warnings;
@@ -37,7 +37,7 @@ options (
 column id => (
 	type => 'integer',
 	auto_increment => true,
-	required => true,
+	mandatory => true,
 	sortable => true,
 	filterable => true,
 	no_render => true
@@ -45,7 +45,7 @@ column id => (
 
 column username => (
 	type => 'string',
-	required => true,
+	mandatory => true,
 	min_length => 3,
 	max_length => 30,
 	sortable => { active => true, direction => "desc" },
@@ -85,7 +85,7 @@ column last_name => (
 column email => (
 	type => 'string',
 	validate => 'email',
-	required => true,
+	mandatory => true,
 	sortable => true,
 	filterable => true,
 	field => {
@@ -145,6 +145,7 @@ column address_line_4 => (
 # all dates will be stored in epoch, format conversion will only happen if requested
 # else it will be the UI/Clients responsibility moment(time).format(...).
 column last_login => (
+	type => 'epoch',
 	format => "YYYY-MM-DD hh:mm:ss",
 	sortable => true,
 	filterable => true,
@@ -154,6 +155,7 @@ column last_login => (
 );
 
 column last_action => (
+	type => 'epoch',
 	format => "YYYY-MM-DD hh:mm:ss",
 	sortable => true,
 	filterable => true,
@@ -161,5 +163,7 @@ column last_action => (
 		type => "none"
 	}
 );
+
+1;
 
 __END__

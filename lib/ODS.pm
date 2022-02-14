@@ -13,7 +13,8 @@ sub import {
 	my $called = caller();
 	my $table = ODS::Table->new();
 	my $bm = Blessed::Merge->new(
-		blessed => 0
+		blessed => 0,
+		same => 0
 	);
 	*{"${called}::true"} = sub { 1; };
 	*{"${called}::false"} = sub { 0; };
@@ -32,11 +33,12 @@ sub import {
 		}
 		$table->add_column(@args);
 	};
+	*{"${called}::storage_class"} = sub {
+		my (@args) = @_;
+		$table->storage_class(pop @args);
+	};
 	*{"${called}::connect"} = sub {
-		
-
-		use Data::Dumper;
-		warn Dumper $table;
+		return $table->connect(@_);
 	};
 }
 
