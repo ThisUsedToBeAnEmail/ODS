@@ -10,7 +10,7 @@ sub find_all_admins {
 	my ($self) = @_;
 
 	$self->admins(
-		$self->table->select(
+		$self->table->search(
 			admin => \1,
 		)
 	);

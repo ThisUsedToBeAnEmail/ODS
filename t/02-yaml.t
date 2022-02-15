@@ -5,7 +5,7 @@ use lib 't/ODS';
 use Table::User;
 use Table::Test;
 
-my $user = Table::User->connect('File::JSON', {
+my $user = Table::User->connect('File::YAML', {
 	file => 't/filedb/users'
 });
 
@@ -15,7 +15,7 @@ is(scalar @{$data}, 1);
 
 my %row = %{ $data->[0] };
 
-my $test = Table::Test->connect('File::JSON', {
+my $test = Table::Test->connect('File::YAML', {
 	file => 't/filedb/test'
 });
 
@@ -117,7 +117,6 @@ $test->create({
 	first_name => 'testing',
 	last_name => 'abc',
 });
-
 
 $find = $test->find(
 	first_name => 'xyz',

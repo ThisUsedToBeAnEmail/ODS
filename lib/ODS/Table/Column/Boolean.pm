@@ -4,13 +4,33 @@ use YAOO;
 
 extends 'ODS::Table::Column::Base';
 
-#sub validation { return $_[1]; }
+use ODS::Utils qw/clone error/;
 
-#sub inflation { return $_[1]; }
+has reference => isa(boolean);
 
-#sub deflation { return $_[1]; }
+sub validation {
+        if (ref($_[1] || "") ne 'SCALAR' && ${$_[1]} !~ m/1|0/) {
+                croak sprintf "The value passed to the %s column does not match the boolean constraint.",
+                        $_[0]->name;
+        }
+	return $_[1]; 
+}
 
-#sub coercion { return $_[1]; }
+sub inflation { 
+	my ($self, $value) = @_; 
+        if (! ref $value) {
+		$self->reference(\1);
+                $value = \!!$value;
+        }
+}
+
+sub deflation {
+	my ($self, $value) = @_;
+	if ($self->reference && ref $value) {
+		$value = $$value;
+	}
+	return $value; 
+}
 
 1;
 

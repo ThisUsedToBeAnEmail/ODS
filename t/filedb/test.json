@@ -1,13 +1,13 @@
 [
    {
-      "username" : "lnation",
+      "first_name" : "test",
       "last_name" : "test",
-      "first_name" : "test"
+      "username" : "lnation"
    },
    {
+      "first_name" : "test2",
       "username" : "lnation2",
-      "last_name" : "test2",
-      "first_name" : "test2"
+      "last_name" : "test2"
    },
    {
       "first_name" : "test3",

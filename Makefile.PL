@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 
 my %WriteMakefileArgs = (
     NAME             => 'ODS',
@@ -17,11 +18,31 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'YAOO' => '0.06',
+        'JSON' => '0',
+	'YAML::XS' => '0',
+	'Cwd' => '0',
+	'File::Copy' => '0',
+	'Data::GUID' => '0',
+	'overload' => '0',
+	'Blessed::Merge' => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'ODS-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/ODS.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/ODS',
+            },
+        },
+    },
+    META_ADD => {
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+    }
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

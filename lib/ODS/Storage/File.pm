@@ -3,9 +3,11 @@ package ODS::Storage::File;
 use YAOO;
 use Cwd qw/getcwd/;
 
-use File::Copy qw/move/;
-
 extends 'ODS::Storage::Base';
+
+use ODS::Utils qw/move error/;
+
+auto_build;
 
 has file_handle => isa(fh);
 
@@ -13,7 +15,7 @@ has file => isa(string), coerce(sub {
 	my ($self, $value) = @_;
 	my $path = getcwd;
 	$value =~ s/^\///;
-	return $path . "/" . $value;
+	return sprintf("%s/%s.%s", $path, $value, $self->file_suffix);
 }), trigger(sub {
 	my ($self, $value) = @_;
 	$value .= '.tmp';
@@ -46,7 +48,7 @@ sub create {
 	$self->table;
 }
 
-sub select {
+sub search {
 	my ($self, %params) = (shift, @_ > 1 ? @_ : %{ $_[0] });
 
 	my $data = $self->table->rows ? ODS::Iterator->new(table => $self->table) : $self->all;
@@ -67,15 +69,19 @@ sub select {
 
 	my $table = $self->table->clone();
 	$table->rows($select);
+	my $table = $self->table->clone();
+	$table->rows($select);
 	ODS::Iterator->new(table => $table);
 }
 
-sub update {
+sub find {
 	my ($self, %params) = (shift, @_ > 1 ? @_ : %{ $_[0] });
 
-	my $data = $self->table->rows ?  ODS::Iterator->new(table => $self->table) : $self->all;
+	my $data = $self->table->rows ? ODS::Iterator->new(table => $self->table) : $self->all;
 	
-	my $index = $data->find_index(sub {
+	# this only works for JSON and YAML, CSS and JSONL we can stream/read rows/lines instead of reading/loading 
+	# all into memory.
+	my $select = $data->find(sub {
 		my $row = shift;
 		my $select = 1;
 		for my $key ( keys %params ) {
@@ -86,15 +92,31 @@ sub update {
 		}
 		$select;
 	});
-	
-	$data->splice($index, 1);
+
+	return $select;
+}
+
+sub update {
+	my ($self, $update, %params) = (shift, pop, @_);
+
+	my $find = $self->find(%params);
+
+	croak sprintf "No row found for search params %s", Dumper \%params
+		unless $find;
+
+	$find->validate($update);
+
+	$self->update_row();
+}
+
+sub update_row {
+	my ($self) = @_;
 
 	my $data = $self->into_storage(1);
 
 	$self->write_file( $data );
 
 	$self->table;
-
 }
 
 sub delete {
@@ -116,25 +138,61 @@ sub delete {
 	
 	$data->splice($index, 1);
 
-	my $data = $self->into_storage(1);
+	$data = $self->into_storage(1);
 
 	$self->write_file( $data );
 
 	$self->table;
 }
 
+sub delete_row {
+	my ($self, $r) = @_;
+
+	my $data = ODS::Iterator->new(table => $self->table);
+
+	my $keyfield = $data->table->keyfield;
+
+	my $index;
+	if ($keyfield) {
+		$index = $data->find_index(sub {
+			$_[0]->{$keyfield} eq $r->$keyfield;
+		});
+	} else {
+		$index = $data->find_index(sub {
+			my $row = shift;
+			my $select = 1;
+			for my $key ( keys %{ $row->columns } ) {
+				if ( $r->$key ne $row->{$key} ) {
+					$select = undef;
+					last;
+				}
+			}
+			$select;
+		});
+	}
+
+	$data->splice($index, 1);
+
+	$data = $self->into_storage(1);
+
+	$self->write_file( $data );
+
+	$self->table;
+}
+
+
 # methods very much specific to files
 
 sub open_file {
 	my ($self) = @_;
-	open my $fh, '<:encoding(UTF-8)', $self->file or die "Cannot open file for reading/writing: $!";
+	open my $fh, '<:encoding(UTF-8)', $self->file or die "Cannot open file for reading: $!";
 	$self->file_handle($fh);
 	return $fh;
 }
 
 sub open_write_file {
 	my ($self) = @_;
-	open my $fh, '>:encoding(UTF-8)', $self->save_file  or die "Cannot open file for reading/writing: $!";
+	open my $fh, '>:encoding(UTF-8)', $self->save_file  or die "Cannot open file for writing: $!";
 	return $fh;
 }
 

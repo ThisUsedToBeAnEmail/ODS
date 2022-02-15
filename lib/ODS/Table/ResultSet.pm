@@ -11,9 +11,14 @@ sub all {
 	return $self->table->storage->all(@params);
 }
 
-sub select {
+sub search {
 	my ($self, @params) = @_;
-	$self->table->storage->select(@params);
+	$self->table->storage->search(@params);
+}
+
+sub find {
+	my ($self, @params) = @_;
+	$self->table->storage->find(@params);
 }
 
 sub create {

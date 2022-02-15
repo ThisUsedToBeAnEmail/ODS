@@ -1,8 +1,8 @@
 package ODS;
 
-use 5.006;
-use strict;
-use warnings;
+use strict; use warnings;
+
+our $VERSION = '0.01';
 
 use ODS::Table;
 use Blessed::Merge;
@@ -44,7 +44,7 @@ sub import {
 
 =head1 NAME
 
-ODS - The great new ODS!
+ODS - Object Data Store
 
 =head1 VERSION
 
@@ -52,40 +52,89 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
-
-
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+	package Table::Patient
 
-Perhaps a little code snippet.
+	use ODS;
 
-    use ODS;
+	name "user";
 
-    my $foo = ODS->new();
-    ...
+	options (
+		custom => 1
+	);
 
-=head1 EXPORT
+	column id => (
+		type => "integer",
+		auto_increment => true,
+		mandatory => true,
+		filterable => true,
+		sortable => true,
+		no_render => true
+	);
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+	column first_name => (
+		type => "string",
+		mandatory => true,
+		filterable => true,
+		sortable => true,
+	);
 
-=head1 SUBROUTINES/METHODS
+	column last_name => (
+		type => "string",
+		mandatory => true,
+		filterable => true,
+		sortable => true,
+	);
 
-=head2 function1
+	column diagnosis => (
+		type => "string",
+		mandatory => true,
+		filterable => true,
+		sortable => true,
+	);
 
-=cut
+	1;
 
-sub function1 {
-}
+	...
 
-=head2 function2
+	package ResultSet::Patient; 
 
-=cut
+	use YAOO;
 
-sub function2 {
-}
+	extends 'ODS::Table::ResultSet";
+
+	has miss_diagnosis => isa(object);
+	
+	sub licenced_doctors {
+		my ($self, %name) = @_;
+
+		$self->miss_diagnosis($self->find(
+			%name	
+		));
+	}
+
+	...
+
+	package Row::Patient;
+
+	use YAOO;
+
+	extends 'ODS::Table::Row';
+
+	...
+
+	my $data = Table::Patient->connect('File::YAML', {
+		file => 't/filedb/patients'
+	});
+
+	my $all = $data->all();
+
+	my $miss_diagnosis = $data->licenced_doctors({ first_name => 'Anonymous', last_name => 'Object' });
+
+	$miss_diagnosis->update(
+		diagnosis => 'pyschosis'
+	);
 
 =head1 AUTHOR
 
@@ -96,9 +145,6 @@ LNATION, C<< <thisusedtobeanemail at gmail.com> >>
 Please report any bugs or feature requests to C<bug-ods at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=ODS>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 

@@ -2,7 +2,7 @@ package ODS::Table::Column::Base;
 
 use YAOO;
 
-use ODS::Utils qw/clone/;
+use ODS::Utils qw/clone error/;
 
 auto_build;
 

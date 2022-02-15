@@ -4,7 +4,15 @@ use YAOO;
 
 extends 'ODS::Table::Column::Base';
 
-#sub validation { return $_[1]; }
+use ODS::Utils qw/error/;
+
+sub validation { 
+        if (ref($_[1])) {
+                croak sprintf "The value passed to the %s column does not match the integer constraint.",
+                        $_[0]->name;
+        }
+	return $_[1]; 
+}
 
 #sub inflation { return $_[1]; }
 

@@ -34,8 +34,7 @@ sub as_hash {
 
 sub set_row {
 	my ($self, $data) = @_;
-
-	for my $key ( %{ $data } ) {
+	for my $key ( keys %{ $data } ) {
 		$self->$key($data->{$key});
 	}
 }
@@ -59,17 +58,14 @@ sub validate {
 }
 
 sub update {
-	my ($self, %update) = @_;
-	my $data = $self->data;
-	for (keys %update) {
-		$data->{$_}->set($update{$_});
-	}
-	$self->table->storage->update($data);
+	my ($self, $update) = (shift, @_ > 1 ? { @_ } : $_[0]);
+	$self->set_row($update);
+	$self->table->storage->update_row();
 }
 
 sub delete {
 	my ($self) = @_;
-	$self->table->storage->delete($self->data);
+	$self->table->storage->delete_row($self);
 }
 
 1;
