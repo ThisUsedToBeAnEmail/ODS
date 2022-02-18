@@ -2,10 +2,11 @@ package ODS;
 
 use strict; use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use ODS::Table;
 use Blessed::Merge;
+use YAOO;
 
 sub import {
 	my $package = shift;
@@ -16,30 +17,33 @@ sub import {
 		blessed => 0,
 		same => 0
 	);
-	*{"${called}::true"} = sub { 1; };
-	*{"${called}::false"} = sub { 0; };
-	*{"${called}::name"} = sub {
+	YAOO::make_keyword($called, "true", sub { 1; });
+	YAOO::make_keyword($called, "false", sub { 0; });
+	YAOO::make_keyword($called, "name", sub {
 		my (@args) = @_;
 		$table->name(@args);
-	};
-	*{"${called}::options"} = sub {
+	});
+	YAOO::make_keyword($called, "options", sub {
 		my (%args) = @_;
 		$table->options($bm->merge($table->options, \%args));
-	};
-	*{"${called}::column"} = sub {
+	});
+	YAOO::make_keyword($called, "column",  sub {
 		my (@args) = @_;
 		if (!$table->name) {
 			$table->name([split "\:\:", $called]->[-1]);
 		}
 		$table->add_column(@args);
-	};
-	*{"${called}::storage_class"} = sub {
+	});
+	YAOO::make_keyword($called, "storage_class",  sub {
 		my (@args) = @_;
 		$table->storage_class(pop @args);
-	};
-	*{"${called}::connect"} = sub {
+	});
+	YAOO::make_keyword($called, "connect", sub {
 		return $table->connect(@_);
-	};
+	});
+	YAOO::make_keyword($called, "instantiate", sub {
+		return $table->instantiate(@_);
+	});
 }
 
 =head1 NAME
@@ -48,13 +52,13 @@ ODS - Object Data Store
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
 =head1 SYNOPSIS
 
-	package Table::Patient
+	package Table::Court;
 
 	use ODS;
 
@@ -98,42 +102,46 @@ Version 0.01
 
 	...
 
-	package ResultSet::Patient; 
+	package ResultSet::Court;
 
 	use YAOO;
 
 	extends 'ODS::Table::ResultSet";
 
+	has people => isa(string);
+
 	has miss_diagnosis => isa(object);
-	
+
 	sub licenced_doctors {
 		my ($self, %name) = @_;
 
 		$self->miss_diagnosis($self->find(
-			%name	
+			%name
 		));
 	}
 
 	...
 
-	package Row::Patient;
+	package Row::Court;
 
 	use YAOO;
 
 	extends 'ODS::Table::Row';
 
+	has barrister => isa(string);
+
 	...
 
-	my $data = Table::Patient->connect('File::YAML', {
+	my $data = Table::Court->connect('File::YAML', {
 		file => 't/filedb/patients'
 	});
 
 	my $all = $data->all();
 
-	my $miss_diagnosis = $data->licenced_doctors({ first_name => 'Anonymous', last_name => 'Object' });
+	my $misdiagnosis = $data->licenced_doctors({ first_name => 'Anonymous', last_name => 'Object' });
 
 	$miss_diagnosis->update(
-		diagnosis => 'pyschosis'
+		diagnosis => 'psychosis'
 	);
 
 =head1 AUTHOR

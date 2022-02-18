@@ -3,3 +3,8 @@ Revision history for ODS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03	2022-02-18
+	- Add directory storage
+	- Add data generation module
+	- Allow for specifying custom file names
+	- Refactor file serialization.

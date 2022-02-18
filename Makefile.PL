@@ -18,14 +18,18 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'YAOO' => '0.06',
+        'YAOO' => '0.07',
         'JSON' => '0',
 	'YAML::XS' => '0',
 	'Cwd' => '0',
 	'File::Copy' => '0',
 	'Data::GUID' => '0',
 	'overload' => '0',
-	'Blessed::Merge' => '0'
+	'Blessed::Merge' => '0',
+	'Term::ProgressSpinner' => '0',
+	'Scalar::Util' => '0',
+	'Parallel::ForkManager' => '0',
+	'Getopt::Long' => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'ODS-*' },

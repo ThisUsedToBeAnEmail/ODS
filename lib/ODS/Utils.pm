@@ -1,25 +1,51 @@
 package ODS::Utils;
 
-use base 'Import::Export';
-
 use YAOO;
-
+no strict 'refs';
 use Data::GUID;
 use File::Copy qw/move/;
 use Carp qw/croak/;
+use Scalar::Util qw//;
 use Data::Dumper qw/Dumper/;
- 
-our %EX = (
-        load => [qw/all/],
-	clone => [qw/all/],
-	unique_id => [qw/all/],
-	build_temp_class => [qw/all/],
-	move => [qw/all/],
-	croak => [qw/error/],
-	Dumper => [qw/error/]
-);
 
-sub clone { 
+our ( %EX, %EX2);
+
+BEGIN {
+	%EX = (
+		load => [qw/all/],
+		clone => [qw/all/],
+		unique_class_name => [qw/all/],
+		build_temp_class => [qw/all/],
+		move => [qw/all/],
+		deep_unblessed => [qw/all/],
+		croak => [qw/error/],
+		Dumper => [qw/error/]
+	);
+	for my $ex (keys %EX) {
+		for (@{ $EX{$ex} }) {
+			push @{ $EX2{$_} }, $ex;
+		}
+	}
+}
+
+sub import {
+	my ($self, @functions) = @_;
+
+	my $caller = caller();
+
+	for my $fun (@functions) {
+		if ($EX{$fun}) {
+			YAOO::make_keyword($caller, $fun, *{"${self}::${fun}"});
+		} elsif ($EX2{$fun}) {
+			for (@{ $EX2{$fun} }) {
+				YAOO::make_keyword($caller, $_,  *{"${self}::${_}"});
+			}
+		}
+	}
+
+}
+
+sub clone {
 	my ($c) = @_;
 	my $n = bless YAOO::deep_clone_ordered_hash($c), ref $c;
 	return $n;
@@ -28,7 +54,7 @@ sub clone {
 sub load {
 	my ($module) = shift;
 	(my $require = $module) =~ s/\:\:/\//g;
-	require $require . '.pm';	
+	require $require . '.pm';
 	return $module;
 }
 
@@ -49,6 +75,22 @@ sub build_temp_class {
                 |, $temp, $class );
         eval $c;
 	return $temp;
+}
+
+sub deep_unblessed {
+	my ($obj) = @_;
+
+	if ((ref($obj) || "SCALAR") !~ m/ARRAY|HASH|SCALAR/) {
+		$obj = {%{ $obj }};
+	}
+
+	if ((ref($obj) || "") eq 'HASH') {
+		for my $key (keys %{ $obj }) {
+			$obj->{$key} = deep_unblessed($obj->{$key});
+		}
+	}
+
+	return $obj;
 }
 
 1;

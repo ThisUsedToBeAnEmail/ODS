@@ -25,9 +25,11 @@ has field => rw, isa(hash);
 has inflated => rw, isa(boolean);
 
 sub build_column {
-	my ($self, $data, $already_inflated) = @_;
+	my ($self, $data, $already_inflated, $serialize) = @_;
 
 	$self = clone($self);
+
+	$self->serialize_class($serialize) if $serialize && $self->can('serialize_class');
 
 	$self->inflated($already_inflated);
 
@@ -62,13 +64,13 @@ sub inflate {
 
 	# has_validation_class
 	return $self unless not $self->inflated and $self->can('inflation');
-	
+
 	$self->value(
 		$self->inflation($self->value)
 	);
 
 	$self->inflated(1);
-	
+
 	return $self;
 }
 
@@ -85,16 +87,6 @@ sub deflate {
 	$self->inflated(0);
 
 	return $self;
-}
-
-sub coerce {
-	my ($self) = @_;
-	
-	return unless $self->can('coercion');
-
-	$self->value(
-		$self->coercion($self->value)
-	);
 }
 
 1;

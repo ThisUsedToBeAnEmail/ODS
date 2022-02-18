@@ -21,7 +21,7 @@ sub all {
 }
 
 sub first {
-	return $_[0]->table->rows->[0];	
+	return $_[0]->table->rows->[0];
 }
 
 sub last {
@@ -109,21 +109,22 @@ sub filter {
 
 sub sort {
 	my ($self, $cb) = @_;
-	@{ $self } = sort { $cb->($_) } @{ $self };
-	@{ $self };
+	@{ $self } = sort { $cb->($a, $b) } @{ $self };
+	$self;
 }
 
 sub shift {
-	shift @{ $_[0] };
+	CORE::shift @{ $_[0] };
 }
 
 sub pop {
-	pop @{ $_[0] };
+	CORE::pop @{ $_[0] };
 }
 
 sub splice {
 	my ($self, @params) = @_;
-	return splice @{$self}, shift @params, shift @params;
+
+	return splice( @{$self}, CORE::shift @params, CORE::shift @params);
 }
 
 1;
