@@ -13,10 +13,10 @@ has required_keys => isa(array);
 has serialize_class => isa(object);
 
 sub validation {
-        if (ref($_[1] || "") ne 'HASH') {
-                croak sprintf "The value passed to the %s column does not match the hash constraint.",
-                        $_[0]->name;
-        }
+	if (ref($_[1] || "") ne 'HASH') {
+		croak sprintf "The value passed to the %s column does not match the hash constraint.",
+			$_[0]->name;
+	}
 	my @missing;
 	if (
 		$_[0]->required_keys && do {
@@ -32,8 +32,8 @@ sub validation {
 
 sub inflation {
 	my ($self, $value) = @_;
-        if (! ref $value) {
-        	$value = $self->serialize_class->parse($value);
+	if (! ref $value) {
+		$value = $self->serialize_class->parse($value);
 		$self->reference(1);
 	}
 	return $value;

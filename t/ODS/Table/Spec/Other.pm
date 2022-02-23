@@ -7,7 +7,7 @@ use ODS;
 
 use Table::Spec::Other::A;
 
-name "test";
+name "other";
 
 options (
 	custom => 1

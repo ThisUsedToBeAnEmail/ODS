@@ -9,19 +9,19 @@ use ODS::Utils qw/clone error/;
 has reference => isa(boolean);
 
 sub validation {
-        if (ref($_[1] || "") ne 'SCALAR' || ${$_[1]} !~ m/1|0/) {
-                croak sprintf "The value passed to the %s column does not match the boolean constraint.",
-                        $_[0]->name;
-        }
+	if (ref($_[1] || "") ne 'SCALAR' || ${$_[1]} !~ m/1|0/) {
+		croak sprintf "The value passed to the %s column does not match the boolean constraint.",
+			$_[0]->name;
+	}
 	return $_[1];
 }
 
 sub inflation {
 	my ($self, $value) = @_;
-        if (! ref $value) {
+	if (! ref $value) {
 		$self->reference(\1);
-                $value = \!!$value;
-        }
+		$value = \!!$value;
+	}
 }
 
 sub deflation {

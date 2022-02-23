@@ -11,7 +11,7 @@ has next_index => isa(integer(0));
 has prev_index => isa(integer(0));
 
 use overload
-        '@{}' => sub { $_[0]->all };
+	'@{}' => sub { $_[0]->all };
 
 # The following sub routines only manipulate the data that is in "memory"
 # to query a larger dataset you should use the storage api/sub routines.

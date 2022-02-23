@@ -2,7 +2,7 @@ package ODS;
 
 use strict; use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use ODS::Table;
 use Blessed::Merge;
@@ -34,6 +34,13 @@ sub import {
 		}
 		$table->add_column(@args);
 	});
+	YAOO::make_keyword($called, "item",  sub {
+		my (@args) = @_;
+		if (!$table->name) {
+			$table->name([split "\:\:", $called]->[-1]);
+		}
+		$table->add_item(@args);
+	});
 	YAOO::make_keyword($called, "storage_class",  sub {
 		my (@args) = @_;
 		$table->storage_class(pop @args);
@@ -52,7 +59,7 @@ ODS - Object Data Store
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -15,9 +15,44 @@ my $test = Table::Spec->connect('Directory', {
 my $spec = $test->create({
 	__custom_file_name => 'height.yml',
 	__serialize => 1,
-	name => 'abc',
+	disallowed => [
+		{
+			a => 1,
+			b => 2
+		},
+		{
+			a => 3,
+			b => 4,
+			c => 5
+		}
+	]
+})->rows->[0];
+
+my $spec2 = $test->create({
+	__custom_file_name => 'width.yml',
+	__serialize => 1,
+	allowed => [
+		qw/1 2 3/
+	]
+})->rows->[-1];
+
+$spec = $test->create({
+	__custom_file_name => 'height.yml',
+	__serialize => 1,
+	kaput => 'abc',
 	allowed => [
 		1, 2, 3
+	],
+	disallowed => [
+		{
+			a => 1,
+			b => 2
+		},
+		{
+			a => 3,
+			b => 4,
+			c => 5
+		}
 	],
 	other => {
 		a => {
@@ -29,9 +64,9 @@ my $spec = $test->create({
 		1 => 'okay',
 		2 => 'not okay',
 	}
-})->rows->[0];
+})->rows->[-1];
 
-ok( $spec->name("Update The Name") );
+ok( $spec->kaput("Update The Name") );
 
 ok( $spec->update() );
 
@@ -41,10 +76,10 @@ my $test2 = Table::Spec->connect('Directory', {
 	serialize_class => 'JSON'
 });
 
-my $spec = $test2->create({
+$spec2 = $test2->create({
 	__custom_file_name => 'width.yml',
 	__serialize => 1,
-	name => 'abc',
+	kaput => 'abc',
 	allowed => [
 		1, 2, 3
 	],
@@ -58,11 +93,11 @@ my $spec = $test2->create({
 		1 => 'okay',
 		2 => 'not okay',
 	}
-})->rows->[0];
+})->rows->[-1];
 
-ok( $spec->name("Update The Name") );
+ok( $spec2->kaput("Update The Name") );
 
-ok( $spec->update() );
+ok( $spec2->update() );
 
 opendir(my $dh, 't/filedb/directory/cache/test2') || die "Can't opendir $directory: $!";
 my @cfiles = sort { $a <=> $b } grep { $_ !~ m/^\.+$/ } readdir($dh);

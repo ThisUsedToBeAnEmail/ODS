@@ -6,7 +6,7 @@ use Parallel::ForkManager;
 
 extends 'ODS::Storage::Base';
 
-use ODS::Utils qw/load move unique_class_name error/;
+use ODS::Utils qw/load move unique_class_name error write_directory/;
 
 auto_build;
 
@@ -391,6 +391,7 @@ sub open_file {
 
 sub open_write_file {
 	my ($self, $file) = @_;
+	write_directory($file, 1);
 	open my $fh, '>:encoding(UTF-8)', $file  or die "Cannot open file $file for writing: $!";
 	return $fh;
 }
@@ -410,6 +411,7 @@ sub read_file {
 
 sub read_directory {
 	my ($self, $directory) = @_;
+	write_directory($directory);
 	opendir(my $dh, $directory) || die "Can't opendir $directory: $!";
 	my @files = sort { $a cmp $b } grep { $_ !~ m/^\.+$/ } readdir($dh);
 	closedir $dh;

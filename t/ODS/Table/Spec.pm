@@ -6,14 +6,15 @@ use warnings;
 use ODS;
 
 use Table::Spec::Other;
+use Table::Spec::Disallowed;
 
-name "test";
+name "spec";
 
 options (
 	custom => 1
 );
 
-column name => (
+column kaput => (
 	type => 'string',
 	mandatory => true,
 	min_length => 3,
@@ -35,6 +36,16 @@ column name => (
 
 column allowed => (
 	type => 'array',
+	field => {
+		attributes => {
+			required => true,
+		}
+	}
+);
+
+column disallowed => (
+	type => 'arrayObject',
+	object_class => 'Table::Spec::Disallowed',
 	field => {
 		attributes => {
 			required => true,

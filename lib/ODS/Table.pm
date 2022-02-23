@@ -68,6 +68,46 @@ sub add_column {
 
 	load $module;
 
+	for my $key ( keys %column ) {
+		delete $column{$key} if not defined $column{$key};
+	}
+
+	my $column = $module->new(\%column);
+
+	$self->columns->{$name} = $column;
+
+	return $self;
+}
+
+sub add_item {
+	my ($self, @args) = @_;
+
+	my $name = 'array_items';
+
+	if (!$self->keyfield) {
+		$self->keyfield($name);
+	}
+
+	if ($self->columns->{$name}) {
+		croak sprintf "Column %s is already defined in the %s table",
+			$name, $self->name;
+	}
+
+	if (scalar @args  % 2) {
+		croak "The column definition for %s does not contain an even number of key/values in the %s table.",
+			$name, $self->name;
+	}
+
+	my %column = @args;
+	$column{name} = $name;
+	if (! $column{type}) {
+		$column{type} = 'string';
+	}
+
+	my $module = 'ODS::Table::Column::' . ucfirst($column{type});
+
+	load $module;
+
 	my $column = $module->new(\%column);
 
 	$self->columns->{$name} = $column;

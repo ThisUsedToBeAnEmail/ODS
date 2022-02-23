@@ -29,7 +29,11 @@ my %WriteMakefileArgs = (
 	'Term::ProgressSpinner' => '0',
 	'Scalar::Util' => '0',
 	'Parallel::ForkManager' => '0',
-	'Getopt::Long' => '0'
+	'Getopt::Long' => '0',
+	'Email::Valid' => '0',
+	'YAML::As::Parsed' => '0.04',
+	'Phone::Valid::International::Loose' => '0',
+        'Data::Dumper' => '0'	
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'ODS-*' },

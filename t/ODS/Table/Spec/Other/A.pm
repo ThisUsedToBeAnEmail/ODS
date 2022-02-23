@@ -5,7 +5,7 @@ use warnings;
 
 use ODS;
 
-name "test";
+name "a";
 
 options (
 	custom => 1

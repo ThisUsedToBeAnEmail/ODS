@@ -18,6 +18,18 @@ sub build {
 	my ($self, %args) = @_;
 
 	$self->table($args{table});
+
+	if (ref $args{data} eq 'ARRAY') {
+		my $column = 'array_items';
+		my $value = [ map { $self->table->parent_column->object_class->instantiate($self->table->parent_column, 0, $_) } @{ $args{data} } ];
+
+		my $col = $self->table->columns->{$column}->build_column(
+			$value, $args{inflated}, $args{serialize_class}
+		);
+		$self->columns->{$column} = $col;
+		return $self;
+	}
+
 	$self->__custom_file_name(delete $args{data}{__custom_file_name});
 	$self->__file(delete $args{data}{__file});
 
